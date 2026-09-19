@@ -1,81 +1,209 @@
 <!doctype html>
-<html lang="ko">
+<html lang="ko" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
 <title>공부하기</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-:root{--bg:#ffffff;--fg:#0b0d10;--muted:#2f353c;--line:#c3cad1;--head:#eef0f2;--accent:#8a2c0d;--link:#0a4f9c;--card:#f7f8f9}
-html.dark{--bg:#111316;--fg:#ffffff;--muted:#d6dce2;--line:#4a525c;--head:#23282f;--accent:#ffb27a;--link:#8cc8ff;--card:#1a1e23}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font:500 16px/1.7 "Pretendard","Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;-webkit-text-size-adjust:100%}
-header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding:10px 16px}
-header h1{margin:0;font-size:18px;font-weight:800}
-#q,#pw{width:100%;margin-top:8px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--fg);font-size:16px}
-main{padding:12px 16px 40px;max-width:900px;margin:0 auto}
-h2.g{font-size:15px;margin:22px 0 8px;color:var(--accent);font-weight:800}
-.item,.btn{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:12px;padding:11px 13px;margin:7px 0;font:inherit;font-weight:700;cursor:pointer}
-.btn{text-align:center;background:var(--accent);color:#fff;border:none}
-.item small{display:block;color:var(--muted);font-weight:500;font-size:12.5px;margin-top:2px}
+:root{
+  --fs:17px;
+  --bg:#f3f4f7; --surface:#ffffff; --surface2:#f7f8fa; --fg:#0e1116; --fg2:#3b424d; --fg3:#6b7380;
+  --line:#e2e5ea; --line2:#cfd4db; --accent:#2f5bd8; --accent-soft:#e7edfc; --accent-fg:#ffffff;
+  --warm:#b4461a; --shadow:0 1px 2px rgba(16,24,40,.06),0 4px 14px rgba(16,24,40,.06);
+  --thead:#eef1f6; --mark:#fff1c2;
+}
+html[data-theme="dark"]{
+  --bg:#0d0f13; --surface:#161a21; --surface2:#1c212a; --fg:#f4f6f9; --fg2:#cfd5de; --fg3:#98a1ae;
+  --line:#262c36; --line2:#343c48; --accent:#7aa7ff; --accent-soft:#1d2a45; --accent-fg:#0d0f13;
+  --warm:#ffae7a; --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 18px rgba(0,0,0,.35);
+  --thead:#1f2530; --mark:#4a3b0c;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--fg)}
+body{font-family:"Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  font-size:var(--fs);line-height:1.72;font-weight:500;letter-spacing:-.01em;-webkit-text-size-adjust:100%}
+button{font:inherit;color:inherit}
+/* 상단 바 */
+.bar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);
+  backdrop-filter:saturate(1.4) blur(10px);-webkit-backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--line)}
+.bar-in{display:flex;align-items:center;gap:8px;padding:10px 14px;max-width:880px;margin:0 auto}
+.bar h1{flex:1;margin:0;font-size:19px;font-weight:800;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar h1 small{display:block;font-size:12px;font-weight:600;color:var(--fg3);letter-spacing:0}
+.ib{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;
+  font-weight:800;cursor:pointer;flex:none;box-shadow:var(--shadow)}
+.ib:active{transform:scale(.96)}
+#back{display:none}
+.progress{height:3px;background:transparent}
+.progress i{display:block;height:100%;width:0;background:var(--accent);transition:width .1s}
+main{max-width:880px;margin:0 auto;padding:14px 14px 90px}
+/* 검색·칩 */
+.search{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  padding:0 12px;box-shadow:var(--shadow)}
+.search input{flex:1;border:none;outline:none;background:transparent;color:var(--fg);padding:12px 0;font:inherit;font-size:16px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:12px 0 4px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:7px 14px;border-radius:999px;border:1px solid var(--line2);background:var(--surface);
+  font-size:14px;font-weight:700;color:var(--fg2);cursor:pointer}
+.chip.on{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+/* 카드 */
+.sec{margin:22px 2px 10px;font-size:13px;font-weight:800;color:var(--fg3);letter-spacing:.02em}
+.hero{display:grid;gap:10px}
+.hcard{display:block;width:100%;text-align:left;border:none;border-radius:18px;padding:16px 16px 14px;cursor:pointer;
+  background:linear-gradient(135deg,var(--accent) 0%,color-mix(in srgb,var(--accent) 70%,#7b3fe4) 100%);color:#fff;box-shadow:var(--shadow)}
+.hcard b{display:block;font-size:1.08em;font-weight:800;line-height:1.4}
+.hcard span{display:block;margin-top:6px;font-size:13px;font-weight:600;opacity:.9}
+.list{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+.row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:none;background:none;padding:13px 14px;cursor:pointer;
+  border-top:1px solid var(--line)}
+.row:first-child{border-top:none}
+.row:active{background:var(--surface2)}
+.ico{flex:none;width:38px;height:38px;border-radius:11px;background:var(--accent-soft);display:grid;place-items:center;font-size:18px}
+.rt{flex:1;min-width:0}
+.rt b{display:block;font-weight:700;line-height:1.4;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.rt small{display:block;margin-top:2px;font-size:12.5px;color:var(--fg3);font-weight:600}
+.chev{flex:none;color:var(--fg3);font-size:18px}
+.empty,.msg{padding:40px 10px;text-align:center;color:var(--fg3)}
+/* 읽기 화면 */
 #doc{display:none}
-#doc h1{font-size:22px;border-bottom:2px solid var(--accent);padding-bottom:6px;font-weight:800}
-#doc h2{font-size:19px;margin-top:30px;border-bottom:1px solid var(--line);padding-bottom:4px;font-weight:800}
-#doc h3{font-size:17px;margin-top:22px;color:var(--accent);font-weight:800}
-#doc strong,#doc th{font-weight:800}
-#doc a{color:var(--link)}
-#doc table{border-collapse:collapse;width:100%;font-size:14px;display:block;overflow-x:auto;margin:10px 0}
-#doc th,#doc td{border:1px solid var(--line);padding:5px 8px;vertical-align:top;text-align:left}
-#doc th{background:var(--head);white-space:nowrap}
-#doc code{background:var(--head);padding:1px 4px;border-radius:4px;font-size:90%}
-#doc blockquote{margin:10px 0;padding:4px 12px;border-left:4px solid var(--accent)}
-#doc ul,#doc ol{padding-left:22px}
-details.toc{border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin:10px 0;background:var(--card)}
-details.toc summary{font-weight:800;cursor:pointer}
-details.toc ul{list-style:none;padding-left:12px;margin:4px 0}
-.tr{font-size:15px}.ts{display:inline-block;min-width:48px;color:var(--accent);font-weight:800}
-.msg{padding:24px 0;text-align:center;color:var(--muted)}
-#back{display:none;border:none;background:none;color:var(--link);font:inherit;font-weight:800;padding:0;margin-right:8px;cursor:pointer}
-#lock{display:none}
-.foot{margin-top:30px;text-align:center}
-.foot button{border:none;background:none;color:var(--muted);text-decoration:underline;font:inherit;font-size:13px;cursor:pointer}
+.doc-head{padding:6px 2px 4px}
+.doc-head h2{margin:0;font-size:1.35em;line-height:1.35;font-weight:800;letter-spacing:-.02em}
+.doc-head small{display:block;margin-top:6px;color:var(--fg3);font-size:13px;font-weight:600}
+.prose{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:6px 18px 22px;margin-top:12px;box-shadow:var(--shadow)}
+.prose h1{font-size:1.3em;margin:18px 0 8px;font-weight:800;line-height:1.35}
+.prose h2{font-size:1.18em;margin:30px 0 10px;padding-top:12px;border-top:1px solid var(--line);font-weight:800;line-height:1.4}
+.prose h3{font-size:1.06em;margin:22px 0 8px;font-weight:800;color:var(--warm)}
+.prose p{margin:10px 0}
+.prose strong{font-weight:800;color:var(--fg)}
+.prose a{color:var(--accent);text-decoration:underline;text-underline-offset:2px;word-break:break-all}
+.prose ul,.prose ol{padding-left:1.3em;margin:8px 0}
+.prose li{margin:4px 0}
+.prose li::marker{color:var(--fg3)}
+.prose blockquote{margin:12px 0;padding:8px 14px;border-left:4px solid var(--warm);background:var(--surface2);border-radius:0 10px 10px 0;color:var(--fg2)}
+.prose code{background:var(--surface2);border:1px solid var(--line);padding:1px 6px;border-radius:6px;font-size:.88em}
+.prose hr{border:none;border-top:1px dashed var(--line2);margin:24px 0}
+.tw{overflow-x:auto;margin:12px -4px;border:1px solid var(--line);border-radius:12px}
+.prose table{border-collapse:collapse;width:100%;font-size:.86em;line-height:1.55}
+.prose th,.prose td{border-bottom:1px solid var(--line);padding:8px 10px;vertical-align:top;text-align:left}
+.prose th{position:sticky;top:0;background:var(--thead);font-weight:800;white-space:nowrap}
+.prose tr:last-child td{border-bottom:none}
+.tr{font-size:.95em}.tr p{margin:0}
+.ts{display:inline-block;min-width:3.4em;margin-right:6px;padding:0 6px;border-radius:6px;background:var(--accent-soft);color:var(--accent);
+  font-weight:800;font-size:.82em;font-variant-numeric:tabular-nums;text-align:center}
+.tline{display:block;padding:4px 0;border-bottom:1px dashed var(--line)}
+/* 떠 있는 버튼 */
+.fab{position:fixed;right:16px;bottom:calc(18px + env(safe-area-inset-bottom));display:none;gap:10px;flex-direction:column;z-index:15}
+.fab button{width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:var(--surface);box-shadow:var(--shadow);font-weight:800;cursor:pointer}
+/* 아래 시트 */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.38);opacity:0;pointer-events:none;transition:opacity .2s;z-index:30}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:31;background:var(--surface);border-radius:22px 22px 0 0;
+  padding:10px 18px calc(22px + env(safe-area-inset-bottom));transform:translateY(105%);transition:transform .25s ease;
+  max-height:78vh;overflow:auto;box-shadow:0 -8px 30px rgba(0,0,0,.25)}
+.sheet .grab{width:42px;height:5px;border-radius:3px;background:var(--line2);margin:0 auto 12px}
+.sheet h3{margin:6px 0 10px;font-size:16px;font-weight:800}
+.open .scrim{opacity:1;pointer-events:auto}
+.open .sheet.show{transform:none}
+.seg{display:flex;background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px;margin-bottom:16px}
+.seg button{flex:1;border:none;background:none;border-radius:9px;padding:9px 4px;font-weight:700;color:var(--fg2);cursor:pointer}
+.seg button.on{background:var(--surface);color:var(--fg);box-shadow:var(--shadow)}
+.preview{border:1px dashed var(--line2);border-radius:12px;padding:10px 12px;color:var(--fg2);margin-bottom:6px}
+.toc ul{list-style:none;padding-left:0;margin:0}
+.toc ul ul{padding-left:14px}
+.toc a{display:block;padding:9px 4px;border-bottom:1px solid var(--line);color:var(--fg);text-decoration:none;font-weight:600}
+/* 잠금 */
+#lock{display:none;padding:40px 6px;text-align:center}
+#lock input{width:100%;max-width:360px;margin:14px auto 10px;display:block;padding:12px 14px;border-radius:12px;border:1px solid var(--line2);
+  background:var(--surface);color:var(--fg);font:inherit;font-size:16px}
+.btn{display:inline-block;padding:11px 26px;border-radius:12px;border:none;background:var(--accent);color:var(--accent-fg);font-weight:800;cursor:pointer}
 </style>
 </head>
 <body>
-<header><h1><button id="back">‹ 목록</button><span id="ttl">📚 공부하기</span></h1><input id="q" placeholder="문서 제목 검색" style="display:none"></header>
+<div class="bar"><div class="bar-in">
+  <button class="ib" id="back" aria-label="목록으로">‹</button>
+  <h1 id="ttl">공부하기<small id="sub">돌팬티·준돌 자료</small></h1>
+  <button class="ib" id="tocBtn" aria-label="목차" style="display:none">☰</button>
+  <button class="ib" id="setBtn" aria-label="글자 크기·테마">가</button>
+</div><div class="progress"><i id="prog"></i></div></div>
+
 <main>
   <div id="lock">
-    <p class="msg">문서가 암호화되어 있습니다.<br>봇 메뉴의 <b>공부하기</b> 버튼으로 다시 열어 주세요. (또는 /pass 로 받은 비밀번호 입력)<br>이 기기의 텔레그램에 기억됩니다.</p>
-    <input id="pw" type="password" autocomplete="off" placeholder="비밀번호">
+    <div style="font-size:40px">🔒</div>
+    <p>문서가 암호화되어 있습니다.<br>봇 대화창의 <b>공부하기</b> 버튼으로 다시 열어 주세요.</p>
+    <input id="pw" type="password" autocomplete="off" placeholder="또는 /pass 로 받은 비밀번호">
     <button class="btn" id="unlock">열기</button>
-    <div class="msg" id="lockmsg"></div>
+    <div class="msg" id="lockmsg" style="padding:12px"></div>
   </div>
-  <div id="list"><div class="msg">불러오는 중…</div></div>
+  <div id="home">
+    <div class="search"><span>🔍</span><input id="q" placeholder="문서 제목 검색"></div>
+    <div class="chips" id="chips"></div>
+    <div id="list"><div class="msg">불러오는 중…</div></div>
+  </div>
   <article id="doc"></article>
-  <div class="foot" id="foot" style="display:none"><button id="forget">이 기기에서 비밀번호 지우기</button></div>
 </main>
+
+<div class="fab" id="fab"><button id="topBtn" aria-label="맨 위로">↑</button></div>
+
+<div id="sheets">
+  <div class="scrim" id="scrim"></div>
+  <div class="sheet" id="setSheet"><div class="grab"></div>
+    <h3>글자 크기</h3>
+    <div class="seg" id="fsSeg"></div>
+    <div class="preview" id="preview">돌팬티는 공포가 나온 날 종가에 사서 다음날 아침 갭에 판다.</div>
+    <h3>테마</h3>
+    <div class="seg" id="thSeg"></div>
+  </div>
+  <div class="sheet toc" id="tocSheet"><div class="grab"></div><h3>목차</h3><div id="tocBody"></div></div>
+</div>
+
 <script>
 const tg = window.Telegram && Telegram.WebApp;
-if (tg) { tg.ready(); tg.expand(); if (tg.colorScheme === 'dark') document.documentElement.classList.add('dark'); }
+if (tg) { tg.ready(); tg.expand(); }
 const $ = s => document.querySelector(s);
 const REV = new URLSearchParams(location.search).get('v') || Date.now();
 const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
-let KEY = null, groups = [];
+const haptic = () => { try { tg && tg.HapticFeedback.selectionChanged(); } catch (e) {} };
+let KEY = null, groups = [], filter = '전체';
 
-// 비밀번호 저장: 텔레그램 CloudStorage(기기 간 동기) → 안 되면 localStorage
+/* ---------- 설정 저장 (텔레그램 CloudStorage + localStorage) ---------- */
+const cs = () => tg && tg.CloudStorage && tg.isVersionAtLeast && tg.isVersionAtLeast('6.9');
 const store = {
-  get: () => new Promise(res => {
-    try { if (tg && tg.CloudStorage && tg.isVersionAtLeast && tg.isVersionAtLeast('6.9'))
-      return tg.CloudStorage.getItem('np_pass', (e, v) => res(e ? null : (v || null))); } catch (e) {}
-    try { res(localStorage.getItem('np_pass')); } catch (e) { res(null); }
-  }),
-  set: v => { try { if (tg && tg.CloudStorage && tg.isVersionAtLeast('6.9')) tg.CloudStorage.setItem('np_pass', v); } catch (e) {}
-              try { localStorage.setItem('np_pass', v); } catch (e) {} },
-  del: () => { try { if (tg && tg.CloudStorage && tg.isVersionAtLeast('6.9')) tg.CloudStorage.removeItem('np_pass'); } catch (e) {}
-               try { localStorage.removeItem('np_pass'); } catch (e) {} },
+  get: k => new Promise(res => { try { if (cs()) return tg.CloudStorage.getItem(k, (e, v) => res(e ? null : (v || null))); } catch (e) {}
+                                  try { res(localStorage.getItem(k)); } catch (e) { res(null); } }),
+  set: (k, v) => { try { if (cs()) tg.CloudStorage.setItem(k, v); } catch (e) {} try { localStorage.setItem(k, v); } catch (e) {} },
+  del: k => { try { if (cs()) tg.CloudStorage.removeItem(k); } catch (e) {} try { localStorage.removeItem(k); } catch (e) {} },
 };
+
+/* ---------- 글자 크기 · 테마 ---------- */
+const SIZES = [['작게', 15], ['보통', 17], ['크게', 19], ['더 크게', 21], ['아주 크게', 23]];
+const THEMES = [['auto', '자동'], ['light', '라이트'], ['dark', '다크']];
+let fsIdx = 1, theme = 'auto';
+function applyFs() { document.documentElement.style.setProperty('--fs', SIZES[fsIdx][1] + 'px');
+  [...$('#fsSeg').children].forEach((b, i) => b.classList.toggle('on', i === fsIdx)); }
+function applyTheme() {
+  const dark = theme === 'dark' || (theme === 'auto' && ((tg && tg.colorScheme === 'dark') ||
+               (!tg && matchMedia('(prefers-color-scheme: dark)').matches)));
+  document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+  try { const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+        tg.setHeaderColor(bg); tg.setBackgroundColor(bg); } catch (e) {}
+  [...$('#thSeg').children].forEach((b, i) => b.classList.toggle('on', THEMES[i][0] === theme));
+}
+SIZES.forEach(([n], i) => { const b = document.createElement('button'); b.textContent = n; b.style.fontSize = (12 + i) + 'px';
+  b.onclick = () => { fsIdx = i; applyFs(); store.set('np_fs', String(i)); haptic(); }; $('#fsSeg').appendChild(b); });
+THEMES.forEach(([k, n]) => { const b = document.createElement('button'); b.textContent = n;
+  b.onclick = () => { theme = k; applyTheme(); store.set('np_theme', k); haptic(); }; $('#thSeg').appendChild(b); });
+if (tg) tg.onEvent('themeChanged', applyTheme);
+
+/* ---------- 시트 ---------- */
+function openSheet(id) { document.body.classList.add('open'); $('#' + id).classList.add('show'); haptic(); }
+function closeSheets() { document.body.classList.remove('open'); document.querySelectorAll('.sheet').forEach(s => s.classList.remove('show')); }
+$('#scrim').onclick = closeSheets;
+$('#setBtn').onclick = () => openSheet('setSheet');
+$('#tocBtn').onclick = () => openSheet('tocSheet');
+
+/* ---------- 암호 ---------- */
 async function derive(pass) {
   const meta = await (await fetch('data/meta.json?v=' + REV, {cache: 'no-store'})).json();
   const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pass), 'PBKDF2', false, ['deriveKey']);
@@ -89,53 +217,98 @@ async function openEnc(path) {
 }
 async function unlock(pass, remember) {
   KEY = await derive(pass);
-  const m = await openEnc('data/m.enc');   // 비밀번호가 틀리면 여기서 예외
-  groups = m.groups; if (remember) store.set(pass);
-  $('#lock').style.display = 'none'; $('#q').style.display = 'block'; $('#foot').style.display = 'block';
-  drawList();
+  const m = await openEnc('data/m.enc');
+  groups = m.groups; if (remember) store.set('np_pass', pass);
+  const n = groups.reduce((a, g) => a + g.items.length, 0);
+  $('#sub').textContent = `문서 ${n}개 · ${m.rev.slice(0, 2)}/${m.rev.slice(2, 4)} ${m.rev.slice(4, 6)}:${m.rev.slice(6, 8)} 갱신`;
+  $('#lock').style.display = 'none'; $('#home').style.display = 'block';
+  drawChips(); drawList();
 }
-function showLock(msg) {
-  $('#list').innerHTML = ''; $('#lock').style.display = 'block'; $('#lockmsg').textContent = msg || '';
+function showLock(msg) { $('#home').style.display = 'none'; $('#lock').style.display = 'block'; $('#lockmsg').textContent = msg || ''; }
+
+/* ---------- 목록 ---------- */
+const ICON = {'핵심': '⭐', '강의·Q&A 정리': '🎓', '분석 보고서': '📊', '브리핑': '📰', '강의 받아쓰기(원문)': '🎙'};
+const SHORT = {'강의·Q&A 정리': '강의·Q&A', '분석 보고서': '분석', '강의 받아쓰기(원문)': '받아쓰기'};
+function drawChips() {
+  const el = $('#chips'); el.innerHTML = '';
+  ['전체', ...groups.map(g => g.group)].forEach(name => {
+    const c = document.createElement('button'); c.className = 'chip' + (name === filter ? ' on' : '');
+    c.textContent = SHORT[name] || name;
+    c.onclick = () => { filter = name; drawChips(); drawList($('#q').value); haptic(); }; el.appendChild(c);
+  });
+}
+function row(i, g) {
+  const b = document.createElement('button'); b.className = 'row';
+  b.innerHTML = `<span class="ico">${ICON[g] || '📄'}</span><span class="rt"><b></b><small></small></span><span class="chev">›</span>`;
+  b.querySelector('b').textContent = i.title; b.querySelector('small').textContent = i.sub + ' 수정';
+  b.onclick = () => openDoc(i); return b;
 }
 function drawList(q = '') {
-  const el = $('#list'); el.innerHTML = '';
+  const el = $('#list'); el.innerHTML = ''; q = q.trim().toLowerCase(); let shown = 0;
   for (const g of groups) {
-    const items = g.items.filter(i => !q || i.title.toLowerCase().includes(q.toLowerCase()));
-    if (!items.length) continue;
-    const h = document.createElement('h2'); h.className = 'g'; h.textContent = g.group + ` (${items.length})`; el.appendChild(h);
-    for (const i of items) {
-      const b = document.createElement('button'); b.className = 'item'; b.textContent = i.title;
-      const s = document.createElement('small'); s.textContent = '수정 ' + i.sub; b.appendChild(s);
-      b.onclick = () => openDoc(i.id); el.appendChild(b);
+    if (filter !== '전체' && filter !== g.group) continue;
+    const items = g.items.filter(i => !q || i.title.toLowerCase().includes(q));
+    if (!items.length) continue; shown += items.length;
+    const h = document.createElement('div'); h.className = 'sec'; h.textContent = `${ICON[g.group] || ''} ${g.group} · ${items.length}`; el.appendChild(h);
+    if (g.group === '핵심' && !q) {
+      const hero = document.createElement('div'); hero.className = 'hero';
+      items.forEach(i => { const c = document.createElement('button'); c.className = 'hcard';
+        c.innerHTML = '<b></b><span></span>'; c.querySelector('b').textContent = i.title; c.querySelector('span').textContent = i.sub + ' 수정 · 읽기 ›';
+        c.onclick = () => openDoc(i); hero.appendChild(c); });
+      el.appendChild(hero); continue;
     }
+    const box = document.createElement('div'); box.className = 'list'; items.forEach(i => box.appendChild(row(i, g.group))); el.appendChild(box);
   }
+  if (!shown) el.innerHTML = '<div class="empty">찾는 문서가 없습니다.</div>';
 }
-async function openDoc(id) {
-  const d = $('#doc'); $('#list').style.display = 'none'; $('#q').style.display = 'none'; $('#foot').style.display = 'none';
-  d.style.display = 'block'; d.innerHTML = '<div class="msg">불러오는 중…</div>'; window.scrollTo(0, 0);
-  $('#back').style.display = 'inline'; if (tg) tg.BackButton.show();
+
+/* ---------- 읽기 ---------- */
+let listScroll = 0;
+async function openDoc(i) {
+  listScroll = scrollY; haptic();
+  const d = $('#doc'); $('#home').style.display = 'none'; d.style.display = 'block';
+  d.innerHTML = '<div class="msg">여는 중…</div>'; scrollTo(0, 0);
+  $('#back').style.display = 'grid'; if (tg) tg.BackButton.show(); $('#fab').style.display = 'flex';
   try {
-    const j = await openEnc('data/' + id + '.enc');
-    $('#ttl').textContent = j.title.slice(0, 24);
-    d.innerHTML = (j.toc && j.toc.includes('<li') ? '<details class="toc"><summary>목차</summary>' + j.toc + '</details>' : '') + j.html;
+    const j = await openEnc('data/' + i.id + '.enc');
+    $('#ttl').firstChild.textContent = j.title.length > 18 ? j.title.slice(0, 18) + '…' : j.title;
+    d.innerHTML = `<div class="doc-head"><h2></h2><small>${i.sub} 수정</small></div><div class="prose">${j.html}</div>`;
+    d.querySelector('h2').textContent = j.title;
+    d.querySelectorAll('.prose table').forEach(t => { const w = document.createElement('div'); w.className = 'tw'; t.replaceWith(w); w.appendChild(t); });
+    d.querySelectorAll('.prose a[href^="http"]').forEach(a => { a.target = '_blank'; a.rel = 'noopener noreferrer'; });
+    const hasToc = j.toc && j.toc.includes('<li');
+    $('#tocBody').innerHTML = hasToc ? j.toc : '';
+    $('#tocBtn').style.display = hasToc ? 'grid' : 'none';
+    $('#tocBody').querySelectorAll('a').forEach(a => a.onclick = e => { e.preventDefault(); closeSheets();
+      const t = document.getElementById(decodeURIComponent(a.getAttribute('href').slice(1)));
+      if (t) scrollTo({top: t.getBoundingClientRect().top + scrollY - 70, behavior: 'smooth'}); });
   } catch (e) { d.innerHTML = '<div class="msg">문서를 열지 못했습니다. 목록으로 돌아가 다시 시도해 주세요.</div>'; }
 }
-function back() { $('#doc').style.display = 'none'; $('#list').style.display = 'block'; $('#q').style.display = 'block';
-  $('#foot').style.display = 'block'; $('#back').style.display = 'none'; $('#ttl').textContent = '📚 공부하기'; if (tg) tg.BackButton.hide(); }
+function back() {
+  if (document.body.classList.contains('open')) return closeSheets();
+  $('#doc').style.display = 'none'; $('#home').style.display = 'block'; $('#back').style.display = 'none';
+  $('#tocBtn').style.display = 'none'; $('#fab').style.display = 'none'; $('#prog').style.width = 0;
+  $('#ttl').firstChild.textContent = '공부하기'; if (tg) tg.BackButton.hide(); scrollTo(0, listScroll);
+}
 $('#back').onclick = back; if (tg) tg.BackButton.onClick(back);
+$('#topBtn').onclick = () => scrollTo({top: 0, behavior: 'smooth'});
+addEventListener('scroll', () => { if ($('#doc').style.display !== 'block') return;
+  const h = document.documentElement.scrollHeight - innerHeight; $('#prog').style.width = (h > 0 ? scrollY / h * 100 : 0) + '%'; }, {passive: true});
 $('#q').oninput = e => drawList(e.target.value);
-$('#unlock').onclick = async () => {
-  $('#lockmsg').textContent = '여는 중…';
-  try { await unlock($('#pw').value.trim(), true); } catch (e) { KEY = null; $('#lockmsg').textContent = '비밀번호가 맞지 않습니다.'; }
-};
+$('#unlock').onclick = async () => { $('#lockmsg').textContent = '여는 중…';
+  try { await unlock($('#pw').value.trim(), true); } catch (e) { KEY = null; $('#lockmsg').textContent = '비밀번호가 맞지 않습니다.'; } };
 $('#pw').addEventListener('keydown', e => { if (e.key === 'Enter') $('#unlock').click(); });
-$('#forget').onclick = () => { store.del(); location.reload(); };
+
+/* ---------- 시작 ---------- */
 (async () => {
-  const urlKey = new URLSearchParams(location.search).get('k');   // 봇이 개인 대화방 버튼에만 실어 보내는 열쇠
+  const [fs, th] = await Promise.all([store.get('np_fs'), store.get('np_theme')]);
+  if (fs !== null && SIZES[+fs]) fsIdx = +fs; if (th && THEMES.some(t => t[0] === th)) theme = th;
+  applyFs(); applyTheme();
+  const urlKey = new URLSearchParams(location.search).get('k');
   if (urlKey) { try { await unlock(urlKey, true); return; } catch (e) {} }
-  const saved = await store.get();
+  const saved = await store.get('np_pass');
   if (!saved) return showLock();
-  try { await unlock(saved, false); } catch (e) { store.del(); showLock('저장된 비밀번호가 바뀌었습니다. 새 비밀번호를 넣어 주세요.'); }
+  try { await unlock(saved, false); } catch (e) { store.del('np_pass'); showLock('저장된 비밀번호가 바뀌었습니다.'); }
 })();
 </script>
 </body>
