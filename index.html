@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
 <title>공부하기</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
@@ -46,7 +47,7 @@ details.toc ul{list-style:none;padding-left:12px;margin:4px 0}
 <header><h1><button id="back">‹ 목록</button><span id="ttl">📚 공부하기</span></h1><input id="q" placeholder="문서 제목 검색" style="display:none"></header>
 <main>
   <div id="lock">
-    <p class="msg">문서가 암호화되어 있습니다.<br>봇이 알려 드린 <b>미니앱 비밀번호</b>를 한 번만 넣어 주세요.<br>이 기기의 텔레그램에 기억됩니다.</p>
+    <p class="msg">문서가 암호화되어 있습니다.<br>봇 메뉴의 <b>공부하기</b> 버튼으로 다시 열어 주세요. (또는 /pass 로 받은 비밀번호 입력)<br>이 기기의 텔레그램에 기억됩니다.</p>
     <input id="pw" type="password" autocomplete="off" placeholder="비밀번호">
     <button class="btn" id="unlock">열기</button>
     <div class="msg" id="lockmsg"></div>
@@ -130,6 +131,8 @@ $('#unlock').onclick = async () => {
 $('#pw').addEventListener('keydown', e => { if (e.key === 'Enter') $('#unlock').click(); });
 $('#forget').onclick = () => { store.del(); location.reload(); };
 (async () => {
+  const urlKey = new URLSearchParams(location.search).get('k');   // 봇이 개인 대화방 버튼에만 실어 보내는 열쇠
+  if (urlKey) { try { await unlock(urlKey, true); return; } catch (e) {} }
   const saved = await store.get();
   if (!saved) return showLock();
   try { await unlock(saved, false); } catch (e) { store.del(); showLock('저장된 비밀번호가 바뀌었습니다. 새 비밀번호를 넣어 주세요.'); }
