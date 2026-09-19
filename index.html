@@ -91,20 +91,19 @@ main{max-width:880px;margin:0 auto;padding:14px 14px 90px}
 .prose th,.prose td{border-bottom:1px solid var(--line);padding:8px 10px;vertical-align:top;text-align:left}
 .prose th{position:sticky;top:0;background:var(--thead);font-weight:800;white-space:nowrap}
 .prose tr:last-child td{border-bottom:none}
-/* 보통 표: 칸을 억지로 누르지 않고 옆으로 밀어 본다 */
+/* 보통 표(2칸에 짧은 값): 칸을 억지로 누르지 않고 옆으로 밀어 본다 */
 .prose table:not(.stack){width:max-content;min-width:100%}
 .prose table:not(.stack) td{max-width:18em}
-/* 긴 글 표: 좁은 화면에서는 행마다 카드 한 장 */
+/* 3칸 이상이거나 값이 긴 표: 좁은 화면에서는 옆스크롤 대신 행마다 카드 한 장, 칸마다 한 줄(라벨 위, 값 아래) */
 @media (max-width:720px){
   .tw.stack{overflow:visible;border:none;border-radius:0;margin:10px 0}
-  .prose table.stack,.prose table.stack tbody,.prose table.stack tr,.prose table.stack td{display:block;width:auto}
+  .prose table.stack,.prose table.stack tbody{display:block;width:auto}
   .prose table.stack thead{display:none}
-  .prose table.stack tr{background:var(--surface2);border:1px solid var(--line);border-radius:14px;margin:0 0 10px;padding:8px 13px 6px}
-  .prose table.stack td{border:none;padding:5px 0;max-width:none}
+  .prose table.stack tr{display:block;background:var(--surface2);border:1px solid var(--line);border-radius:14px;margin:0 0 10px;padding:9px 13px 7px}
+  .prose table.stack td{display:block;border:none;max-width:none;padding:5px 0}
   .prose table.stack td.empty{display:none}
-  .prose table.stack td::before{content:attr(data-label);display:block;font-size:.8em;font-weight:800;color:var(--fg3);margin-bottom:1px}
-  .prose table.stack td:first-child{font-size:1.04em;padding-bottom:7px;margin-bottom:3px;border-bottom:1px dashed var(--line2)}
-  .prose table.stack td:first-child::before{display:none}
+  .prose table.stack td:first-child{font-size:1.04em;font-weight:800;padding:2px 0 7px;margin-bottom:4px;border-bottom:1px dashed var(--line2)}
+  .prose table.stack td:not(:first-child)::before{content:attr(data-label);display:block;font-size:.8em;font-weight:800;color:var(--fg3);margin-bottom:1px}
 }
 .tr{font-size:.95em}.tr p{margin:0}
 .ts{display:inline-block;min-width:3.4em;margin-right:6px;padding:0 6px;border-radius:6px;background:var(--accent-soft);color:var(--accent);
@@ -226,20 +225,21 @@ async function derive(pass) {
   return crypto.subtle.deriveKey({name: 'PBKDF2', salt: b64(meta.salt), iterations: meta.iter, hash: 'SHA-256'},
                                  base, {name: 'AES-GCM', length: 256}, false, ['decrypt']);
 }
-// 표 정리: 긴 글이 든 3칸 이상 표는 좁은 화면에서 행마다 카드로(칸 앞에 머리글), 나머지는 옆으로 밀어 보게
+// 표 정리: 3칸 이상이거나 값이 긴 2칸 표는 좁은 화면에서 옆스크롤 대신 행마다 카드로(칸마다 한 줄).
+// 숫자표든 문장표든 방식을 하나로 통일한다 — 칩처럼 옆으로 늘어놓으면 값이 길 때 화면 밖으로 잘리는 문제가 있었다.
 function layoutTables(root) {
   root.querySelectorAll('.prose table').forEach(t => {
     const w = document.createElement('div'); w.className = 'tw'; t.replaceWith(w); w.appendChild(t);
     const heads = [...t.querySelectorAll('thead th')].map(th => th.textContent.trim());
-    const cells = [...t.querySelectorAll('tbody td')];
-    const longest = Math.max(0, ...cells.map(c => c.textContent.trim().length));
-    if (heads.length >= 3 && longest > 45) {
-      t.classList.add('stack'); w.classList.add('stack');
-      t.querySelectorAll('tbody tr').forEach(tr => [...tr.children].forEach((td, i) => {
-        td.dataset.label = heads[i] || '';
-        if (/^[—\-–]?$/.test(td.textContent.trim())) td.classList.add('empty');
-      }));
-    }
+    const rows = [...t.querySelectorAll('tbody tr')];
+    const maxLen = Math.max(0, ...rows.flatMap(tr => [...tr.children]).map(c => c.textContent.trim().length));
+    const shouldStack = heads.length >= 3 || (heads.length === 2 && maxLen > 50);
+    if (!shouldStack) return;
+    t.classList.add('stack'); w.classList.add('stack');
+    rows.forEach(tr => [...tr.children].forEach((td, i) => {
+      td.dataset.label = heads[i] || '';
+      if (/^[—\-–]?$/.test(td.textContent.trim())) td.classList.add('empty');
+    }));
   });
 }
 
