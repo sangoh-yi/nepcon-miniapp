@@ -308,7 +308,9 @@ async function openDoc(i) {
     d.innerHTML = `<div class="doc-head"><h2></h2><small>${i.sub} 수정</small></div><div class="prose">${j.html}</div>`;
     d.querySelector('h2').textContent = j.title;
     layoutTables(d);
-    d.querySelectorAll('.prose a[href^="http"]').forEach(a => { a.target = '_blank'; a.rel = 'noopener noreferrer'; });
+    d.querySelectorAll('.prose a[href^="http"]').forEach(a => { a.target = '_blank'; a.rel = 'noopener noreferrer';
+      // 텔레그램 안에서는 openLink 로 열어야 확실하다(강의 영상 = 네이버 유료 글, 브라우저에서 네이버 로그인 필요)
+      if (tg && tg.openLink) a.onclick = e => { e.preventDefault(); try { tg.openLink(a.href); } catch (_) { window.open(a.href, '_blank'); } }; });
     const hasToc = j.toc && j.toc.includes('<li');
     $('#tocBody').innerHTML = hasToc ? j.toc : '';
     $('#tocBtn').style.display = hasToc ? 'grid' : 'none';
