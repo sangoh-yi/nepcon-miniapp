@@ -310,7 +310,9 @@ async function openDoc(i) {
     layoutTables(d);
     d.querySelectorAll('.prose a[href^="http"]').forEach(a => { a.target = '_blank'; a.rel = 'noopener noreferrer';
       // 텔레그램 안에서는 openLink 로 열어야 확실하다(강의 영상 = 네이버 유료 글, 브라우저에서 네이버 로그인 필요)
-      if (tg && tg.openLink) a.onclick = e => { e.preventDefault(); try { tg.openLink(a.href); } catch (_) { window.open(a.href, '_blank'); } }; });
+      if (tg && tg.openLink) a.onclick = e => { e.preventDefault();
+        try { if (a.href.startsWith('https://t.me/') && tg.openTelegramLink) { tg.openTelegramLink(a.href); tg.close && setTimeout(() => tg.close(), 300); } else tg.openLink(a.href); }
+        catch (_) { window.open(a.href, '_blank'); } }; });
     const hasToc = j.toc && j.toc.includes('<li');
     $('#tocBody').innerHTML = hasToc ? j.toc : '';
     $('#tocBtn').style.display = hasToc ? 'grid' : 'none';
