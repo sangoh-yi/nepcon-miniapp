@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko" data-theme="light">
+<html lang="ko" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -194,7 +194,7 @@ const store = {
 /* ---------- 글자 크기 · 테마 ---------- */
 const SIZES = [['작게', 15], ['보통', 17], ['크게', 19], ['더 크게', 21], ['아주 크게', 23]];
 const THEMES = [['auto', '자동'], ['light', '라이트'], ['dark', '다크']];
-let fsIdx = 1, theme = 'auto';
+let fsIdx = 1, theme = 'dark';  // 기본 다크(2026-10-23 사용자 "텔레그램 미니앱은 다크가 기본") — 고르면 그 값을 기억
 function applyFs() { document.documentElement.style.setProperty('--fs', SIZES[fsIdx][1] + 'px');
   [...$('#fsSeg').children].forEach((b, i) => b.classList.toggle('on', i === fsIdx)); }
 function applyTheme() {
